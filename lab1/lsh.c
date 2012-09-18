@@ -102,7 +102,6 @@ static int parse()
   // Look for patterns of the form: <name>=<value>
   (void)regcomp(&regex, "([a-zA-Z]+[a-zA-Z0-9]*)=(.*)", cflags);
   rc = regexec(&regex, cmd, SZ(pmatch), pmatch, 0);
-  int i;
   if (rc != 0) {
     /*
      * Not a variable setting so assume it's a command
@@ -112,14 +111,12 @@ static int parse()
     /*
      * pmatch[1] marks var name start and end
      * pmatch[2] marks var value start and end
-     * Because we would otherwise change the cmd buffer, let's
-     * make a working copy
      */
-    char *name = strdup(cmd);
-    char *value = index(name, '=');
-    *value++ = '\0';  // Erase and skip past the assignment operator
+    char *name = strndup(cmd, pmatch[1].rm_eo - pmatch[1].rm_so);
+    char *value = strndup(cmd + pmatch[2].rm_so, pmatch[2].rm_eo - pmatch[2].rm_so);
     setvar(name, value);
     free(name);
+    free(value);
   }
 }
 
