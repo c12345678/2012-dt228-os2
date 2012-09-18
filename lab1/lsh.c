@@ -127,10 +127,11 @@ static int repl()
 {
   int status = 0;
 
-	for (prompt(); fgets(cmd, sizeof(cmd), stdin) != NULL; prompt()) {
+  for (prompt(); fgets(cmd, sizeof(cmd), stdin) != NULL; prompt()) {
     status = parse();
+
     // TODO Bind to the exit code of the command just run to $?
-	}
+  }
 }
 
 
