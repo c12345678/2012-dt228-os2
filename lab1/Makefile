@@ -1,4 +1,4 @@
 default: lsh
 
 clean:
-	rm lsh *~
+	rm -f lsh *~
