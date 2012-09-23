@@ -20,6 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
@@ -31,20 +32,26 @@ typedef enum {
   S_START,
   S_DQUOTE,
   S_SQUOTE,
-  S_ESCAPING,
-  S_BEGIN,
   S_TOKEN,
   S_SPECIAL
 } state_t;
 
-#define SPECIAL(c)      ((c) != '\\' && ((c) == '|' || (c) == '&' || (c) == '<' || (c) == '>'))
+#define SPECIAL(c)      ((c) != '\\' && ((c) == '|' || (c) == '&' || (c) == '<' || (c) == '>' || (c) == '='))
 
-#define TERMINAL(c, ep) ((isspace(c) || SPECIAL(c)) && (ep) == NULL)
+#define TERMINAL(c, ep) (((c) == '\0' || isspace(c) || SPECIAL(c)) && (ep) == NULL)
 
+/*
+ * Return a dynamically allocated array of tokens and update the count
+ * with the number of fetched tokens if provided by the caller
+ */
 token_t **
 tokenise_fetch(const char *src, int *count)
 {
   token_t **tokens = NULL;
+  int tmp_count;
+  if (!count) {
+    count = &tmp_count;
+  }
   *count = 0;
   char *cp = (char *)src, *sp = NULL, *ep = NULL, *value = NULL;
   state_t state = S_START;
@@ -79,7 +86,7 @@ tokenise_fetch(const char *src, int *count)
       break;
     case S_DQUOTE:
       // End of a dquote string.
-      if (*cp == '"' && ep == NULL || *cp == '\0') {
+      if ((*cp == '"' && ep == NULL) || *cp == '\0') {
         value = strndup(sp, cp - sp);
         type = T_ARG;
         state = S_START;
@@ -88,7 +95,7 @@ tokenise_fetch(const char *src, int *count)
       break;
     case S_SQUOTE:
       // End of a squote string.
-      if (*cp == '\'' && ep == NULL || *cp == '\0') {
+      if ((*cp == '\'' && ep == NULL) || *cp == '\0') {
         value = strndup(sp, cp - sp);
         type = T_ARG;
         state = S_START;
@@ -117,6 +124,8 @@ tokenise_fetch(const char *src, int *count)
       case '&': type = T_BACKGROUND; break;
       case '<': type = T_FROMFILE; break;
       case '>': type = T_TOFILE; break;
+      case '=': type = T_ASSIGN; break;
+      case ';': type = T_ENDSTMT; break;
       default:  type = T_UNDEF; break;  // Error
       }
       state = S_START;
@@ -155,12 +164,7 @@ tokenise_free(token_t *tokens[], int count)
   }
 }
 
-
-
-#ifdef TOKENISE_TEST
-#include <stdio.h>
-
-static void
+void
 tokenise_print(token_t *tokens[], int count)
 {
   int i;
@@ -169,11 +173,16 @@ tokenise_print(token_t *tokens[], int count)
   }
 }
 
+
+
+#ifdef TOKENISE_TEST
+
 int main(int argc, char *argv[])
 {
   int count;
-  token_t **tokens = tokenise_fetch("ps -ef|egrep '(root | arch)'|sort -u&", &count);
+  token_t **tokens = tokenise_fetch("export VAR='123'; ps -ef|egrep '(root | arch)'|sort -u&", &count);
   tokenise_print(tokens, count);
   tokenise_free(tokens, count);
+  exit(0);
 }
 #endif

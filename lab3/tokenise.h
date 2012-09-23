@@ -28,6 +28,8 @@ typedef enum {
   T_BACKGROUND,
   T_FROMFILE,
   T_TOFILE,
+  T_ASSIGN,
+  T_ENDSTMT,
 } ttype_t;
 
 typedef struct {
@@ -40,3 +42,6 @@ tokenise_fetch(const char *src, int *count);
 
 void
 tokenise_free(token_t *tokens[], int count);
+
+void
+tokenise_print(token_t *tokens[], int count);

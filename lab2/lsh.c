@@ -1,7 +1,7 @@
 // vim: set ts=2 sw=2 expandtab:
 
 /*
- * A functioning learning shell (lsh) with fork() and a symbol table
+ * Basic outline template of the learning shell (lsh)
  *
  * Copyright (C) 2012  Brian Gillespie
  *
@@ -44,7 +44,7 @@ static char *progname;
 
 static void license()
 {
-  fprintf(stderr, "%s: Copyright (C) 2012 Brian Gillespie\n"
+  fprintf(stderr, "%s Copyright (C) 2012 Brian Gillespie\n"
                   "This program comes with ABSOLUTELY NO WARRANTY; This is free software,\n"
                   "and you are welcome to redistribute it under certain conditions;\n", progname);
 }
