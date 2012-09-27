@@ -1,7 +1,7 @@
 // vim: set ts=2 sw=2 expandtab:
 
 /*
- * Basic outline template of the learning shell (lsh)
+ * A functioning learning shell (lsh) with fork() and a symbol table
  *
  * Copyright (C) 2012  Brian Gillespie
  *
@@ -27,31 +27,50 @@
 #include <regex.h>
 #include <unistd.h>
 #include <libgen.h>
+#include <sys/wait.h>
+
+#include "symtab.h"
+#include "tokenise.h"
 
 #define SZ(t) (sizeof(t) / sizeof(t[0]))
 
-// $ getconf ARG_MAX
+/*
+ * You get the following number by running 'getconf ARG_MAX' on the shell
+ * command line for your system. This is the value for the Arch Linux 
+ * version we're using in this module
+ */
 #define ARG_MAX 2097152                
 
 // For simplicity of implementation, this cmd buffer is visible to all functions
 static char cmd[ARG_MAX + 1];
 
-// Starting with a hard coded prompt string.
-// TODO Make this user configurable through an environment variable setting
+// TODO Use for internal symbol table
+static symbol_t *symtab;
+
+// Default prompt string
 #define PS1 "lsh>> "
 
 static char *progname;
 
+/*
+ * TODO Add internal commands to support the copyright and license commands
+ * noted in the following message
+ */
 static void license()
 {
-  fprintf(stderr, "%s Copyright (C) 2012 Brian Gillespie\n"
-                  "This program comes with ABSOLUTELY NO WARRANTY; This is free software,\n"
-                  "and you are welcome to redistribute it under certain conditions;\n", progname);
+  if (isatty(fileno(stdout))) {
+    fprintf(stderr, "%s: Copyright (C) 2012 Brian Gillespie\n"
+                    "This program comes with ABSOLUTELY NO WARRANTY; This is free software,\n"
+                    "and you are welcome to redistribute it under certain conditions;\n"
+                    "Type \"copyright\" or \"license\" for more information.\n", progname);
+  }
 }
 
 static void init()
 {
-  // Does nothing yet
+  /*
+   * TODO Initialize the symbol table with some default values
+   */
 }
 
 // Show the command prompt
@@ -62,6 +81,7 @@ static void prompt()
    * to a terminal and not being redirected to a pipe or file
    */
   if (isatty(fileno(stdout))) {
+    // TODO Use an environment variable called PS1 to determine the prompt's value
     fprintf(stdout, PS1);
   }
 }
@@ -75,32 +95,40 @@ static void exiting()
   free(progname);
 }
 
+static int external(int argc, char **argv)
+{
+    int status = -1;
+
+    execv(argv[0], argv);
+    /*
+     * Shouldn't get here if above has been successful
+     */
+    perror(argv[0]);
+
+    return status;
+}
+
 /*
  * Run an internal or external command
- * TODO Add support for internal commands
  */
 static int dispatch()
 {
-  int status;
+  int status = -1;
+  int argc = 1;
   /*
-   * TODO Add support for passing argument list to called programs
+   * TODO Add support for relative paths
+   * TODO Add support looking up the PATH variable
+   * TODO Add support for passing argument list to called commands
+   *      i.e. build an argv[] array using the tokeniser
    */
-  execl(cmd, cmd, (char *)0);
+  char **argv = calloc(argc + 1, sizeof(char *));
+  argv[0] = strdup(cmd);
+  argv[1] = NULL;
+  status = external(argc, argv);
+  free(argv[0]);
+  free(argv);
 
-  /*
-   * Shouldn't get here if above successful has been successful
-   * TODO Improve the error message
-   */
-  perror(cmd);
-  return -1;
-}
-
-static void setvar(const char *name, const char *value)
-{
-  /*
-   * TODO Add support for setting name=value
-   */
-  fprintf(stderr, "Not Implemented: %s=%s\n", name, value);
+  return status;
 }
 
 /*
@@ -128,22 +156,19 @@ static int parse()
   // Look for patterns of the form: <name>=<value>
   (void)regcomp(&regex, "([a-zA-Z]+[a-zA-Z0-9]*)=(.*)", cflags);
   rc = regexec(&regex, cmd, SZ(pmatch), pmatch, 0);
-  if (rc != 0) {
+  if (rc == 0) {
+    /*
+     * TODO Use the tokeniser to get the name and value and add to our symbol table
+     */
+  } else {
     /*
      * Not a variable setting so assume it's a command
      */
     dispatch();
-  } else {
-    /*
-     * pmatch[1] marks var name start and end
-     * pmatch[2] marks var value start and end
-     */
-    char *name = strndup(cmd, pmatch[1].rm_eo - pmatch[1].rm_so);
-    char *value = strndup(cmd + pmatch[2].rm_so, pmatch[2].rm_eo - pmatch[2].rm_so);
-    setvar(name, value);
-    free(name);
-    free(value);
   }
+
+  // FIXME
+  return 0;
 }
 
 static int repl()
@@ -155,6 +180,8 @@ static int repl()
 
     // TODO Bind to the exit code of the command just run to $?
   }
+
+  return status;
 }
 
 
@@ -165,4 +192,5 @@ int main(int argc, char *argv[])
   license();
   repl();
   exiting();
+  exit(0);
 }
