@@ -73,7 +73,7 @@ rescue => e
   end
 end
 
-$stderr.puts "\n#{@passes} out of #{tests.size} tests passed of #{@run} test cases run. "
+msg "\n#{@passes} out of #{tests.size} tests passed of #{@run} test cases run. "
 if @run < tests.size
-  $stderr.puts "#{tests.size - @run} test cases could not run. Fix failing unit-test-#{@run - 1} to proceed\n"
+  msg "#{tests.size - @run} test cases could not run. Fix failing unit-test-#{@run - 1} to proceed\n"
 end
