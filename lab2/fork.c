@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     // Child
     printf("child: after fork()\n");
     printf("child: sleeping...\n");
-    sleep(2);
+    sleep(10);
     printf("child: exiting()\n");
   } else {
     // Parent
