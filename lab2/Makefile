@@ -24,4 +24,4 @@ tests: lsh
 	tests/test_runner.rb $(shell pwd)/$(BIN)
 
 clean:
-	rm -f lsh *~ *.o tokenise lsh symtab tests/*~
+	rm -f lsh *~ *.o tokenise fork lsh symtab tests/*~

@@ -34,12 +34,14 @@
 
 #define SZ(t) (sizeof(t) / sizeof(t[0]))
 
+#ifndef ARG_MAX
 /*
  * You get the following number by running 'getconf ARG_MAX' on the shell
  * command line for your system. This is the value for the Arch Linux 
  * version we're using in this module
  */
 #define ARG_MAX 2097152                
+#endif
 
 // For simplicity of implementation, this cmd buffer is visible to all functions
 static char cmd[ARG_MAX + 1];
