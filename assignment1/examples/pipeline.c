@@ -166,13 +166,7 @@ int main(int argc, char *argv[])
    * The parent of the first command (i.e. this program) is not in the
    * pipeline
    */
-  pid_t pid = run(&argv[1], false);
-  if (pid != -1) {
-    /*
-     * Wait on the last process created
-     */
-    waitpid(pid, NULL, 0);
-  }
+  run(&argv[1], false);
 
   exit(0);
 } 
