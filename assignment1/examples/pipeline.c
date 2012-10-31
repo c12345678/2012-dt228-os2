@@ -46,7 +46,7 @@ pid_t run(char **cmdlist, bool inpipeline)
   }
 
   /*
-   * A pipe is a bi-directional communcations channel consisting of
+   * A pipe is a uni-directional communcations channel consisting of
    * two file descriptors. Once opened, data written on the write-side
    * descriptpr pipefds[1] can be read on read-side pipefds[0]
    */
