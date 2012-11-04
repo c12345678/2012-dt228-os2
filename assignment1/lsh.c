@@ -1,5 +1,6 @@
 // vim: set ts=2 sw=2 expandtab:
 
+
 /*
  * A functioning learning shell (lsh)
  *
