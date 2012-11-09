@@ -63,7 +63,8 @@ end
 %x{tar zcf #{file} assignment1}
 unless Dir.glob(file).first == file
   $stderr.puts "#{$0}: Error creating submission bundle. Check that you have tar(1) and gzip(1) installed"
+  exit 1
 end
 
-$stderr.puts submit(id, url, file, cookie_jar, token)
+$stdout.puts submit(id, url, file, cookie_jar, token)
 exit 0
