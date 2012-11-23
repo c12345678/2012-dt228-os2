@@ -76,6 +76,9 @@ int main(int argc, char *argv[])
   if (argc != 2 || sscanf(argv[1], "%d", &waitsecs) != 1) {
     usage();
   }
+  if (waitsecs == 0) {
+    waitsecs = 1;
+  }
 
   shm_unlink(SHM_NAME);
   int fd = shm_open(SHM_NAME, O_CREAT|O_RDWR|O_EXCL, FILE_MODE);

@@ -11,5 +11,10 @@ default: $(BINS)
 
 .PHONY: clean
 
+tests: $(BINS)
+	@echo 1>&2 '***************************************************************'
+	@echo 1>&2 'No tests available to run. These will be made available shortly'
+	@echo 1>&2 '***************************************************************'
+
 clean:
 	rm -f *~ *.o $(BINS) *.out
