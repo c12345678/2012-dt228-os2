@@ -1,13 +1,12 @@
 BINS = shm_server shm_client
 
-DEPS = Makefile
-CFLAGS = -g -O0 -Wall
-LDFLAGS = -lpthread -lrt
-
 default: $(BINS)
 
-%.o: %.c $(DEPS)
-	$(CC) $(CFLAGS) -c $< $(LDFLAGS)
+shm_server: shm_server.c
+	$(CC) -g -O0 -Wall -c $< -o $@ -lpthread -lrt
+
+shm_client: shm_client.c
+	$(CC) -g -O0 -Wall -c $< -o $@ -lpthread -lrt
 
 .PHONY: clean
 
