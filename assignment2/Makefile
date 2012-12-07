@@ -3,10 +3,10 @@ BINS = shm_server shm_client
 default: $(BINS)
 
 shm_server: shm_server.c
-	$(CC) -g -O0 -Wall -c $< -o $@ -lpthread -lrt
+	$(CC) -g -O0 -Wall $< -o $@ -lpthread -lrt
 
 shm_client: shm_client.c
-	$(CC) -g -O0 -Wall -c $< -o $@ -lpthread -lrt
+	$(CC) -g -O0 -Wall $< -o $@ -lpthread -lrt
 
 .PHONY: clean
 
