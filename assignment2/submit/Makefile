@@ -1,5 +1,8 @@
 submit:
-	@echo 1>&2 '*************************************************************'
-	@echo 1>&2 'Submission not yet enabled. It will be made available shortly'
-	@echo 1>&2 '*************************************************************'
+	@./submit.rb http://dit.briangillespie.net $(ID) $(PIN) 2>/dev/null || \
+		echo "You must be conneted to the Internent provide a valid ID and PIN. Use: $$ make ID=yourStudentID PIN=yourPIN"
 
+.PHONY: clean
+
+clean:
+	rm -rf *~ *.tar.gz assignment2 cookie.txt
