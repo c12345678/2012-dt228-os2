@@ -86,12 +86,26 @@ int main(int argc, char *argv[])
   close(fd);
 
   /*
-   * TODO
    * 1. Wait until a free buffer slot becomes available
+   */
+  sem_wait(&sptr->nempty);
+
+  /*
    * 2. When one does, write the message into the buffer list, advancing
    *    the write index and accounting for write wrap around
+   */
+  sem_wait(&sptr->mutex);
+  strncpy(sptr->msgdata[sptr->windex], msg, sizeof sptr->msgdata[0] - 1);
+  sptr->msgdata[sptr->windex][sizeof sptr->msgdata[0]  - 1] = '\0';
+  if (++sptr->windex == SHM_NMSG) {
+    sptr->windex = 0;
+  }
+  sem_post(&sptr->mutex);
+
+  /*
    * 3. Signal that there is one more message to read.
    */
+  sem_post(&sptr->nstored);
 
   exit(0);
 }

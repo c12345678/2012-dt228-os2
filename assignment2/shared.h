@@ -12,6 +12,8 @@
 
 #define FILE_MODE (S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH)
 
+#define sleep(x)  (void)usleep(x)
+
 /*
  * You may alter this structure as you require to but
  * leave the magic number as the first field

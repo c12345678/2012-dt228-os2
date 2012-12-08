@@ -1,4 +1,5 @@
 BINS = shm_server shm_client
+PWD = $(shell pwd)
 
 default: $(BINS)
 
@@ -11,9 +12,10 @@ shm_client: shm_client.c
 .PHONY: clean
 
 tests: $(BINS)
-	@echo 1>&2 '***************************************************************'
-	@echo 1>&2 'No tests available to run. These will be made available shortly'
-	@echo 1>&2 '***************************************************************'
+	@tests/test_runner.rb $(PWD)/shm_server $(PWD)/shm_client
+
+grade: $(BINS)
+	@tests/test_runner.rb $(PWD)/shm_server $(PWD)/shm_client --grade
 
 clean:
 	rm -f *~ *.o $(BINS) *.out
