@@ -76,6 +76,9 @@ int main(int argc, char *argv[])
   if (argc != 2 || sscanf(argv[1], "%d", &waitsecs) != 1) {
     usage();
   }
+  if (waitsecs == 0) {
+    waitsecs = 1;
+  }
 
   shm_unlink(SHM_NAME);
   int fd = shm_open(SHM_NAME, O_CREAT|O_RDWR|O_EXCL, FILE_MODE);
@@ -97,9 +100,6 @@ int main(int argc, char *argv[])
    * TODO
    * Initialize the semaphores to their inital values using sem_init(3)
    */
-  sem_init(&sptr->mutex, 1, 1);
-  sem_init(&sptr->nempty, 1, SHM_NMSG);
-  sem_init(&sptr->nstored, 1, 0);
 
   setbuf(stdout, NULL);
 
@@ -107,26 +107,12 @@ int main(int argc, char *argv[])
   while (!doexit) {
 
     /*
+     * TODO
      * 1. Wait until a message is available to process
-     */
-    sem_wait(&sptr->nstored);
-
-    /*
      * 2. When a message becomes available, remove it from the message list,
      *    advancing the read index and handling read index wrapping
-     */
-    sem_wait(&sptr->mutex);
-    char *msg = strdup(sptr->msgdata[sptr->rindex]);
-    if (++sptr->rindex == SHM_NMSG) {
-      sptr->rindex = 0;
-    }
-    sem_post(&sptr->mutex);
-
-    /*
      * 3. Print the message contents to the screen
      */
-    printf("%s\n", msg);
-    free(msg);
 
     /*
      * IMPORTANT: You must keep the following call to sleep here, otherwise
@@ -137,7 +123,7 @@ int main(int argc, char *argv[])
     /*
      * 4. Signal that a free message slot is available
      */
-    sem_post(&sptr->nempty);
+
   }
 
   exit(0);
